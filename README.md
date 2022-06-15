@@ -14,4 +14,6 @@ Add the following dependency to the POM file:
 
 The H2 JAR contains an in-memory database suitable for test purposes, as well as the necessary JDBC drivers.
 
-Complete various SQL commands to create a DB, create a table, insert data, modify data, remove data, delete the table, and drop the database.
+Complete various SQL commands to create a database, create a table, insert data, modify data, remove data, delete the table, and drop the database.
+
+(Note for H2: creating/dropping a database is not supported for the in-memory database).
