@@ -1,11 +1,16 @@
+// Mod6Practice.java
+// D. Singletary
+// 6/15/22
+// JDBC Demo
+
 import java.sql.*;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 public class Mod6Practice {
 
     // precondition: database created with name (specified below),
     // user name and password is same as database name
-    static final String DB_NAME = "cop2805c";
+    static final String DB_NAME = "RetailStore";
     //static final String USER_NAME = DB_NAME;
     //static final String USER_PW = DB_NAME;
 
@@ -29,7 +34,7 @@ public class Mod6Practice {
 
     // declare the SQL statements we will be executing
     static final String SQL_CREATE_TABLE = "CREATE TABLE Customer " +
-            "(CustomerID varchar(6) PRIMARY KEY NOT NULL," +
+            "(CustomerID int PRIMARY KEY NOT NULL," +
             "LastName varchar(20) NOT NULL," +
             "FirstName varchar(20) NOT NULL," +
             "Address varchar(20) NOT NULL," +
@@ -39,40 +44,21 @@ public class Mod6Practice {
 
     static final String SQL_DROP_TABLE = "DROP TABLE Customer";
     static final String SQL_INSERT_ROW1 = "INSERT INTO Customer VALUES(" +
-            "'A10001', 'Smith', 'John', '1 Elm St.', 'Jacksonville', 'FL', '32242')";
+            "'100001', 'Smith', 'John', '1 Elm St.', 'Jacksonville', 'FL', '32242')";
     static final String SQL_INSERT_ROW2 = "INSERT INTO Customer VALUES(" +
-            "'A10002', 'Brown', 'Sally', '2 Oak Dr.', 'Orlando', 'FL', '32808')";
+            "'100002', 'Brown', 'Sally', '2 Oak Dr.', 'Orlando', 'FL', '32808')";
     static final String SQL_SELECT = "SELECT * FROM Customer";
-
-    // heading for table data output
-    static final String TABLE_HEADING = "CUSTID " +
-            "LAST NAME              " +
-            "FIRST NAME             " +
-            "ADDRESS                " +
-            "CITY                   " +
-            "STATE  " +
-            "ZIP";
-
-    // column names
-    static final String TABLE_COL_CUSTID = "CustomerID";
-    static final String TABLE_COL_LASTNAME = "LastName";
-    static final String TABLE_COL_FIRSTNAME = "FirstName";
-    static final String TABLE_COL_ADDRESS = "Address";
-    static final String TABLE_COL_CITY = "City";
-    static final String TABLE_COL_STATE = "State";
-    static final String TABLE_COL_ZIP = "Zip";
 
     // table format string
     static final String TABLE_FORMAT = "%-7.7s%-20.20s%-20.20s%-20.20s%-20.20s%-6.6s%6.6s\n";
 
     // need a scanner to pause execution to examine table before dropping it
-    static Scanner input = new Scanner(System.in);
+    //static Scanner input = new Scanner(System.in);
 
     public static void main(String[] args) {
         // https://h2database.com/html/cheatSheet.html
         try(Connection con = DriverManager.getConnection(CONN_URL)) {
             Statement stmt = con.createStatement(); // this can be reused
-            ResultSet rs = null;
 
             log("Check for valid connection: " + con.isValid(0));
 
@@ -85,9 +71,34 @@ public class Mod6Practice {
             stmt.executeUpdate(SQL_CREATE_TABLE);
             log("Table created");
 
+            // insert some data
+            stmt.executeUpdate(SQL_INSERT_ROW1);
+            stmt.executeUpdate(SQL_INSERT_ROW2);
+            log("records added");
+
+            ResultSet rs = stmt.executeQuery(SQL_SELECT); // get everything
+            log("query results:");
+
+            while (rs.next())
+            {
+                // All of our table fields are Strings, call "getString" to
+                // get each field from the ResultSet and save it for display
+                int custID = rs.getInt("CustomerID");
+                String lastName = rs.getString("LastName");
+                String firstName = rs.getString("FirstName");
+                String address = rs.getString("Address");
+                String city = rs.getString("City");
+                String state = rs.getString("State");
+                String zip = rs.getString("Zip");
+                //System.out.printf("%-7.7s%-20.20s%-20.20s%-20.20s%-20.20s%-6.6s%6.6s\n",
+                System.out.printf(TABLE_FORMAT,
+                        custID, lastName, firstName, address, city, state, zip);
+            }
+
             // drop the table and DB
+            log("dropping table");
             stmt.executeUpdate(SQL_DROP_TABLE);
-            log("Customer table dropped");
+            log("table dropped");
 
             // H2 embedded drops the table automatically
             //stmt.executeUpdate("DROP DATABASE " + DB_NAME + ";");
